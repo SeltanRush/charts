@@ -51,9 +51,26 @@ const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChar
 
   const xScale = d3.scaleBand().domain(data.map(xValue)).range([0, width]).padding(0.3);
 
-  svg.append('g').call(d3.axisLeft(yScale).ticks(10));
+  const yAxisG = svg.append('g');
+  yAxisG.call(d3.axisLeft(yScale).ticks(10).tickFormat(d3.format('.3s')));
 
-  svg.append('g').attr('transform', `translate(0, ${height})`).call(d3.axisBottom(xScale));
+  svg
+    .append('g')
+    .attr('transform', `translate(0, ${height})`)
+    .call(d3.axisBottom(xScale))
+    .selectAll('.domain, .tick line')
+    .remove();
+
+  svg.selectAll('text').style('font-size', '12px');
+
+  yAxisG
+    .append('text')
+    .attr('fill', 'black')
+    .style('font-size', '12px')
+    .style('text-anchor', 'end')
+    .attr('dx', 0)
+    .attr('dy', -10)
+    .text('Population');
 
   svg
     .selectAll('rect')

@@ -2,10 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 const margin = {
-  top: 50,
-  left: 50,
-  right: 50,
-  bottom: 50,
+  top: 60,
+  left: 60,
+  right: 60,
+  bottom: 60,
 };
 
 const width = 900 - margin.left - margin.right;
@@ -22,16 +22,15 @@ interface ILocalProps {
 
 const BarChart: React.FC<ILocalProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const container = containerRef.current;
 
   useEffect(() => {
-    if (container) {
+    if (containerRef && containerRef.current) {
       drawChart({
-        container,
+        container: containerRef.current,
         data,
       });
     }
-  }, [container, data]);
+  }, [containerRef, data]);
 
   return <div ref={containerRef}></div>;
 };
@@ -45,7 +44,30 @@ const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChar
     .append('g')
     .attr('transform', `translate(${margin.top}, ${margin.left})`);
 
-  svg.selectAll('rect').data(data).enter();
+  const yScale = d3
+    .scaleLinear()
+    .domain([0, d3.max(data, yValue)!])
+    .range([height, 0]);
+
+  const xScale = d3.scaleBand().domain(data.map(xValue)).range([0, width]).padding(0.3);
+
+  svg.append('g').call(d3.axisLeft(yScale).ticks(10));
+
+  svg.append('g').attr('transform', `translate(0, ${height})`).call(d3.axisBottom(xScale));
+
+  svg
+    .selectAll('rect')
+    .data(data)
+    .enter()
+    .append('rect')
+    .attr('y', (d) => yScale(yValue(d)))
+    .attr('x', (d) => xScale(xValue(d))!)
+    .attr('width', (d) => xScale.bandwidth())
+    .attr('height', (d) => height - yScale(yValue(d)))
+    .attr('fill', 'steelblue');
 };
+
+const xValue = (d: IChartData) => d.name;
+const yValue = (d: IChartData) => d.value;
 
 export default BarChart;

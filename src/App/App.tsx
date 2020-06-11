@@ -5,6 +5,7 @@ import BarChart from '../components/BarChart/BarChart';
 
 import styles from './App.module.css';
 import { countriesPopulations } from '../fixtures/countriesPopulations';
+import ScatterPlot from '../components/ScatterPlot/ScatterPlot';
 
 function App() {
   const barChartData = useMemo(
@@ -26,6 +27,11 @@ function App() {
       <div className={styles.chart}>
         <h3 className={styles.chart__title}>BarChart</h3>
         <BarChart data={barChartData} />
+      </div>
+
+      <div className={styles.chart}>
+        <h3 className={styles.chart__title}>ScatterPlot</h3>
+        <ScatterPlot data={barChartData} />
       </div>
     </div>
   );

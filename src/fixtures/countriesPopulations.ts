@@ -1,6 +1,6 @@
 import { CountryPopulation } from '../models/CountryPopulation';
 
-export const countriesPopulations: Array<CountryPopulation> = [
+export const countriesPopulations: CountryPopulation[] = [
   { countryName: 'China', population: 1415046 },
   { countryName: 'India', population: 1354052 },
   { countryName: 'United States', population: 326767 },

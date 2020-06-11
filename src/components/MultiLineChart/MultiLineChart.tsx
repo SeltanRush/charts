@@ -43,11 +43,13 @@ const drawChart = ({
 
   const width = 1100 - margin.left - margin.right;
   const height = 600 - margin.top - margin.bottom;
-  const circleR = 4;
+
+  d3.select(container).select('svg.mlc').remove();
 
   const svg = d3
     .select(container)
     .append('svg')
+    .attr('class', 'mlc')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')

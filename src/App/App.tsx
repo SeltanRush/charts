@@ -10,6 +10,7 @@ import { cars } from '../fixtures/cars';
 import { temperature } from '../fixtures/temperature';
 import MultiLineChart from '../components/MultiLineChart/MultiLineChart';
 import { citiesTemperature } from '../fixtures/citiesTemperature';
+import CitiesTemperatureChart from 'components/CitiesTemperatureChart/CitiesTemperatureChart';
 
 function App() {
   const barChartData = useMemo(
@@ -36,16 +37,6 @@ function App() {
     []
   );
 
-  const multiLineChartData = useMemo(
-    () =>
-      citiesTemperature.map((d) => ({
-        x: new Date(d.timestamp),
-        y: d.temperature,
-        category: d.city,
-      })),
-    []
-  );
-
   return (
     <div className={styles.root}>
       <div className={styles.chart}>
@@ -69,11 +60,7 @@ function App() {
 
       <div className={styles.chart}>
         <h3 className={styles.chart__title}>MultiLineChart</h3>
-        <MultiLineChart
-          data={multiLineChartData}
-          yLabel="Temperature"
-          xLabel="Date"
-        />
+        <CitiesTemperatureChart data={citiesTemperature} />
       </div>
     </div>
   );

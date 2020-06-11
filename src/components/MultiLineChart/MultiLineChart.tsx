@@ -37,13 +37,13 @@ const drawChart = ({
   const margin = {
     top: 60,
     left: 80,
-    right: 60,
+    right: 180,
     bottom: 80,
   };
 
-  const width = 900 - margin.left - margin.right;
+  const width = 1100 - margin.left - margin.right;
   const height = 600 - margin.top - margin.bottom;
-  const circleR = 6;
+  const circleR = 4;
 
   const svg = d3
     .select(container)
@@ -116,10 +116,9 @@ const drawChart = ({
     .x((d) => xScale(xValue(d)))
     .curve(d3.curveBasis);
 
-  svg
-    .selectAll('.line-path')
-    .data(nested)
-    .enter()
+  const nestedEnter = svg.selectAll('.line-path').data(nested).enter();
+
+  const lines = nestedEnter
     .append('path')
     .attr('class', 'line-path')
     .attr('d', (d) => lineGenerator(d.values) || '')
@@ -147,6 +146,31 @@ const drawChart = ({
         .style('stroke-width', 3)
         .style('cursor', 'none');
     });
+
+  const groups = svg.append('g').selectAll('g').data(colorScale.domain());
+
+  const groupsEnter = groups.enter().append('g');
+
+  groupsEnter
+    .merge(groups.select('g'))
+    .attr('transform', (d, i) => `translate(${width + 30}, ${100 + i * 25})`);
+
+  groupsEnter
+    .merge(groups.select('rect'))
+    .append('rect')
+    .attr('width', 14)
+    .attr('height', 14)
+    .attr('class', 'legendRect')
+    .attr('fill', (d) => colorScale(d));
+
+  groupsEnter
+    .merge(groups.select('text'))
+    .append('text')
+    .text((d) => d)
+    .attr('x', 20)
+    .attr('y', '.8em')
+    .attr('fill', 'black')
+    .style('font-size', '14px');
 };
 
 const xValue = (d: IChartData) => d.x;

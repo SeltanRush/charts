@@ -7,6 +7,7 @@ import styles from './App.module.css';
 import { countriesPopulations } from '../fixtures/countriesPopulations';
 import ScatterPlot from '../components/ScatterPlot/ScatterPlot';
 import { cars } from '../fixtures/cars';
+import { temperature } from '../fixtures/temperature';
 
 function App() {
   const barChartData = useMemo(
@@ -27,11 +28,17 @@ function App() {
     []
   );
 
+  const lineChartData = useMemo(
+    () =>
+      temperature.map((d) => ({ x: new Date(d.timestamp), y: d.temperature })),
+    []
+  );
+
   return (
     <div className={styles.root}>
       <div className={styles.chart}>
         <h3 className={styles.chart__title}>LineChart</h3>
-        <LineChart />
+        <LineChart data={lineChartData} yLabel="Temperature" xLabel="Date" />
       </div>
 
       <div className={styles.chart}>
@@ -41,7 +48,11 @@ function App() {
 
       <div className={styles.chart}>
         <h3 className={styles.chart__title}>ScatterPlot</h3>
-        <ScatterPlot xLabel="Horsepower" yLabel="Weight" data={scatterPlotData} />
+        <ScatterPlot
+          xLabel="Horsepower"
+          yLabel="Weight"
+          data={scatterPlotData}
+        />
       </div>
     </div>
   );

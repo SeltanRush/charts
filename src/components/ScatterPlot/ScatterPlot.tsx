@@ -35,7 +35,7 @@ const drawChart = ({
 }: { container: HTMLDivElement } & ILocalProps) => {
   const margin = {
     top: 60,
-    left: 60,
+    left: 80,
     right: 60,
     bottom: 80,
   };
@@ -50,7 +50,7 @@ const drawChart = ({
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform', `translate(${margin.top}, ${margin.left})`);
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   const yScale = d3
     .scaleLinear()
@@ -63,11 +63,18 @@ const drawChart = ({
     .range([0, width]);
 
   const yAxisG = svg.append('g');
-  yAxisG.call(d3.axisLeft(yScale).ticks(10).tickFormat(d3.format('.3s')).tickSize(-width));
+  yAxisG.call(
+    d3
+      .axisLeft(yScale)
+      .ticks(10)
+      .tickFormat(d3.format('.3s'))
+      .tickSize(-width)
+      .tickPadding(10)
+  );
 
   const xAxisG = svg.append('g').attr('transform', `translate(0, ${height})`);
 
-  xAxisG.call(d3.axisBottom(xScale).tickSize(-height));
+  xAxisG.call(d3.axisBottom(xScale).tickSize(-height).tickPadding(10));
 
   svg.selectAll('.domain').remove();
   svg.selectAll('.tick line').style('opacity', '0.5');
@@ -77,10 +84,11 @@ const drawChart = ({
   yAxisG
     .append('text')
     .attr('fill', 'black')
-    .style('font-size', '14px')
-    .style('text-anchor', 'end')
-    .attr('dx', 0)
-    .attr('dy', -10)
+    .style('font-size', '20px')
+    .style('text-anchor', 'middle')
+    .attr('x', -height / 2)
+    .attr('y', -50)
+    .attr('transform', 'rotate(-90)')
     .text(yLabel);
 
   xAxisG
@@ -100,7 +108,7 @@ const drawChart = ({
     .attr('cy', (d) => yScale(yValue(d)))
     .attr('cx', (d) => xScale(xValue(d)) || 0)
     .attr('r', circleR)
-    .attr('fill', 'steelblue')
+    .attr('fill', 'red')
     .attr('opacity', '0.5');
 };
 

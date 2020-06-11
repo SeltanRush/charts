@@ -35,21 +35,31 @@ const BarChart: React.FC<ILocalProps> = ({ data }) => {
   return <div ref={containerRef}></div>;
 };
 
-const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChartData[] }) => {
+const drawChart = ({
+  container,
+  data,
+}: {
+  container: HTMLDivElement;
+  data: IChartData[];
+}) => {
   const svg = d3
     .select(container)
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform', `translate(${margin.top}, ${margin.left})`);
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   const yScale = d3
     .scaleLinear()
     .domain([0, d3.max(data, yValue) || 0])
     .range([height, 0]);
 
-  const xScale = d3.scaleBand().domain(data.map(xValue)).range([0, width]).padding(0.3);
+  const xScale = d3
+    .scaleBand()
+    .domain(data.map(xValue))
+    .range([0, width])
+    .padding(0.3);
 
   const yAxisG = svg.append('g');
   yAxisG.call(d3.axisLeft(yScale).ticks(10).tickFormat(d3.format('.3s')));

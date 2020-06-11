@@ -8,6 +8,8 @@ import { countriesPopulations } from '../fixtures/countriesPopulations';
 import ScatterPlot from '../components/ScatterPlot/ScatterPlot';
 import { cars } from '../fixtures/cars';
 import { temperature } from '../fixtures/temperature';
+import MultiLineChart from '../components/MultiLineChart/MultiLineChart';
+import { citiesTemperature } from '../fixtures/citiesTemperature';
 
 function App() {
   const barChartData = useMemo(
@@ -34,6 +36,16 @@ function App() {
     []
   );
 
+  const multiLineChartData = useMemo(
+    () =>
+      citiesTemperature.map((d) => ({
+        x: new Date(d.timestamp),
+        y: d.temperature,
+        category: d.city,
+      })),
+    []
+  );
+
   return (
     <div className={styles.root}>
       <div className={styles.chart}>
@@ -52,6 +64,15 @@ function App() {
           xLabel="Horsepower"
           yLabel="Weight"
           data={scatterPlotData}
+        />
+      </div>
+
+      <div className={styles.chart}>
+        <h3 className={styles.chart__title}>MultiLineChart</h3>
+        <MultiLineChart
+          data={multiLineChartData}
+          yLabel="Temperature"
+          xLabel="Date"
         />
       </div>
     </div>

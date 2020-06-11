@@ -120,7 +120,7 @@ const drawChart = ({
 
   const nestedEnter = svg.selectAll('.line-path').data(nested).enter();
 
-  const lines = nestedEnter
+  nestedEnter
     .append('path')
     .attr('class', 'line-path')
     .attr('d', (d) => lineGenerator(d.values) || '')
@@ -177,6 +177,5 @@ const drawChart = ({
 
 const xValue = (d: IChartData) => d.x;
 const yValue = (d: IChartData) => d.y;
-const colorValue = (d: IChartData) => d.category;
 
 export default MultiLineChart;

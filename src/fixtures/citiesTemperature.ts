@@ -1,4 +1,6 @@
-export const citiesTemperature = [
+import { CityTemperature } from '../models/CityTemperature';
+
+export const citiesTemperature: CityTemperature[] = [
   {
     timestamp: '2015-03-20T21:00:00.000Z',
     city: 'San Francisco',

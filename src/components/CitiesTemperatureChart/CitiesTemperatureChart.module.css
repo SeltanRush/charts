@@ -1,0 +1,18 @@
+.root {
+}
+
+.cities {
+  display: flex;
+}
+
+.city {
+  padding: 5px 8px;
+  background: steelblue;
+  color: white;
+  border-radius: 10px;
+  margin-right: 8px;
+}
+
+.city_active {
+  background: orange;
+}

@@ -2,39 +2,47 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 interface IChartData {
-  value: number;
-  name: string;
+  x: number;
+  y: number;
 }
 
 interface ILocalProps {
   data: IChartData[];
+  xLabel: string;
+  yLabel: string;
 }
 
-const ScatterPlot: React.FC<ILocalProps> = ({ data }) => {
+const ScatterPlot: React.FC<ILocalProps> = (props) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
       drawChart({
         container: containerRef.current,
-        data,
+        ...props,
       });
     }
-  }, [containerRef, data]);
+  }, [containerRef, props]);
 
   return <div ref={containerRef}></div>;
 };
 
-const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChartData[] }) => {
+const drawChart = ({
+  container,
+  data,
+  yLabel,
+  xLabel,
+}: { container: HTMLDivElement } & ILocalProps) => {
   const margin = {
     top: 60,
     left: 60,
     right: 60,
-    bottom: 60,
+    bottom: 80,
   };
 
   const width = 900 - margin.left - margin.right;
   const height = 600 - margin.top - margin.bottom;
+  const circleR = 8;
 
   const svg = d3
     .select(container)
@@ -46,11 +54,13 @@ const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChar
 
   const yScale = d3
     .scaleLinear()
-    .domain([0, d3.max(data, yValue) || 0])
-    .range([height, 0])
-    .nice();
+    .domain([d3.min(data, yValue) || 0, d3.max(data, yValue) || 0])
+    .range([height, 0]);
 
-  const xScale = d3.scalePoint().domain(data.map(xValue)).range([0, width]).padding(0.3);
+  const xScale = d3
+    .scaleLinear()
+    .domain([d3.min(data, xValue) || 0, d3.max(data, xValue) || 0])
+    .range([0, width]);
 
   const yAxisG = svg.append('g');
   yAxisG.call(d3.axisLeft(yScale).ticks(10).tickFormat(d3.format('.3s')).tickSize(-width));
@@ -67,11 +77,20 @@ const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChar
   yAxisG
     .append('text')
     .attr('fill', 'black')
-    .style('font-size', '12px')
+    .style('font-size', '14px')
     .style('text-anchor', 'end')
     .attr('dx', 0)
     .attr('dy', -10)
-    .text('Population');
+    .text(yLabel);
+
+  xAxisG
+    .append('text')
+    .attr('fill', 'black')
+    .style('font-size', '20px')
+    .style('text-anchor', 'center')
+    .attr('dx', width / 2)
+    .attr('dy', 40)
+    .text(xLabel);
 
   svg
     .selectAll('circle')
@@ -80,11 +99,12 @@ const drawChart = ({ container, data }: { container: HTMLDivElement; data: IChar
     .append('circle')
     .attr('cy', (d) => yScale(yValue(d)))
     .attr('cx', (d) => xScale(xValue(d)) || 0)
-    .attr('r', 10)
-    .attr('fill', 'steelblue');
+    .attr('r', circleR)
+    .attr('fill', 'steelblue')
+    .attr('opacity', '0.5');
 };
 
-const xValue = (d: IChartData) => d.name;
-const yValue = (d: IChartData) => d.value;
+const xValue = (d: IChartData) => d.x;
+const yValue = (d: IChartData) => d.y;
 
 export default ScatterPlot;

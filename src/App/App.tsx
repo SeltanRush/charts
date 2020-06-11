@@ -6,6 +6,7 @@ import BarChart from '../components/BarChart/BarChart';
 import styles from './App.module.css';
 import { countriesPopulations } from '../fixtures/countriesPopulations';
 import ScatterPlot from '../components/ScatterPlot/ScatterPlot';
+import { cars } from '../fixtures/cars';
 
 function App() {
   const barChartData = useMemo(
@@ -13,6 +14,15 @@ function App() {
       countriesPopulations.map((d) => ({
         value: d.population,
         name: d.countryName,
+      })),
+    []
+  );
+
+  const scatterPlotData = useMemo(
+    () =>
+      cars.map((d) => ({
+        x: d.horsepower,
+        y: d.weight,
       })),
     []
   );
@@ -31,7 +41,7 @@ function App() {
 
       <div className={styles.chart}>
         <h3 className={styles.chart__title}>ScatterPlot</h3>
-        <ScatterPlot data={barChartData} />
+        <ScatterPlot xLabel="Horsepower" yLabel="Weight" data={scatterPlotData} />
       </div>
     </div>
   );

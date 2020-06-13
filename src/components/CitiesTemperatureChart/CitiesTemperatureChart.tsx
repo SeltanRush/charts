@@ -42,6 +42,7 @@ const CitiesTemperatureChart: React.FC<ILocalProps> = ({ data }) => {
       <div className={styles.cities}>
         {cities.map((city) => (
           <City
+            key={city}
             toggleCity={toggleCity}
             city={city}
             isActive={includedCities.includes(city)}

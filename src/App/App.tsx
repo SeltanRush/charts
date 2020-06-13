@@ -8,7 +8,6 @@ import { countriesPopulations } from '../fixtures/countriesPopulations';
 import ScatterPlot from '../components/ScatterPlot/ScatterPlot';
 import { cars } from '../fixtures/cars';
 import { temperature } from '../fixtures/temperature';
-import MultiLineChart from '../components/MultiLineChart/MultiLineChart';
 import { citiesTemperature } from '../fixtures/citiesTemperature';
 import CitiesTemperatureChart from 'components/CitiesTemperatureChart/CitiesTemperatureChart';
 

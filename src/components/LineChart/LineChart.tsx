@@ -42,7 +42,6 @@ const drawChart = ({
 
   const width = 900 - margin.left - margin.right;
   const height = 600 - margin.top - margin.bottom;
-  const circleR = 6;
 
   const svg = d3
     .select(container)

@@ -14,26 +14,32 @@ interface ILocalProps {
 }
 
 const MultiLineChart: React.FC<ILocalProps> = (props) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef(null);
 
   useEffect(() => {
-    if (containerRef && containerRef.current) {
-      drawChart({
-        container: containerRef.current,
-        ...props,
-      });
-    }
-  }, [containerRef, props]);
+    drawChart({
+      svgRef,
+      ...props,
+    });
+  }, [props]);
 
-  return <div ref={containerRef}></div>;
+  return (
+    <svg ref={svgRef}>
+      <g className="container">
+        <g className="yAxis"></g>
+        <g className="xAxis"></g>
+        <g className="legends"></g>
+      </g>
+    </svg>
+  );
 };
 
 const drawChart = ({
-  container,
+  svgRef,
   data,
   yLabel,
   xLabel,
-}: { container: HTMLDivElement } & ILocalProps) => {
+}: { svgRef: React.RefObject<SVGElement> } & ILocalProps) => {
   const margin = {
     top: 60,
     left: 80,
@@ -44,15 +50,14 @@ const drawChart = ({
   const width = 1100 - margin.left - margin.right;
   const height = 600 - margin.top - margin.bottom;
 
-  d3.select(container).select('svg.mlc').remove();
+  const animationDuration = 300;
 
   const svg = d3
-    .select(container)
-    .append('svg')
+    .select(svgRef.current)
     .attr('class', 'mlc')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
-    .append('g')
+    .select('g.container')
     .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
   const nested = d3
@@ -63,7 +68,8 @@ const drawChart = ({
   const yScale = d3
     .scaleLinear()
     .domain([d3.min(data, yValue) || 0, d3.max(data, yValue) || 0])
-    .range([height, 0]);
+    .range([height, 0])
+    .nice();
 
   const xScale = d3
     .scaleTime()
@@ -75,42 +81,50 @@ const drawChart = ({
     .scaleOrdinal(d3.schemeCategory10)
     .domain(nested.map((d) => d.key));
 
-  const yAxisG = svg.append('g');
-  yAxisG.call(d3.axisLeft(yScale).ticks(10).tickSize(-width).tickPadding(10));
+  const yAxisG = svg
+    .select<SVGSVGElement>('g.yAxis')
+    .transition()
+    .duration(animationDuration)
+    .call(d3.axisLeft(yScale).ticks(10).tickSize(-width).tickPadding(10));
 
-  const xAxisG = svg.append('g').attr('transform', `translate(0, ${height})`);
+  const xAxisG = svg
+    .select<SVGSVGElement>('g.xAxis')
+    .attr('transform', `translate(0, ${height})`);
 
-  xAxisG.call(
-    d3
-      .axisBottom(xScale)
-      .tickSize(-height)
-      .tickPadding(10)
-      .tickFormat(d3.timeFormat('%a %d') as any)
-  );
+  xAxisG
+    .transition()
+    .duration(animationDuration)
+    .call(
+      d3
+        .axisBottom(xScale)
+        .tickSize(-height)
+        .tickPadding(10)
+        .tickFormat(d3.timeFormat('%a %d') as any)
+    );
 
   svg.selectAll('.domain').remove();
   svg.selectAll('.tick line').style('opacity', '0.5');
 
   svg.selectAll('text').style('font-size', '12px');
 
-  yAxisG
-    .append('text')
-    .attr('fill', 'black')
-    .style('font-size', '20px')
-    .style('text-anchor', 'middle')
-    .attr('x', -height / 2)
-    .attr('y', -50)
-    .attr('transform', 'rotate(-90)')
-    .text(yLabel);
+  // yAxisG
+  //   .append('text')
+  //   .attr('fill', 'black')
+  //   .style('font-size', '20px')
+  //   .style('text-anchor', 'middle')
+  //   .attr('x', -height / 2)
+  //   .attr('y', -50)
+  //   .attr('transform', 'rotate(-90)')
+  //   .text(yLabel);
 
-  xAxisG
-    .append('text')
-    .attr('fill', 'black')
-    .style('font-size', '20px')
-    .style('text-anchor', 'center')
-    .attr('dx', width / 2)
-    .attr('dy', 40)
-    .text(xLabel);
+  // xAxisG
+  //   .append('text')
+  //   .attr('fill', 'black')
+  //   .style('font-size', '20px')
+  //   .style('text-anchor', 'center')
+  //   .attr('dx', width / 2)
+  //   .attr('dy', 40)
+  //   .text(xLabel);
 
   const lineGenerator = d3
     .line<IChartData>()
@@ -118,10 +132,10 @@ const drawChart = ({
     .x((d) => xScale(xValue(d)))
     .curve(d3.curveBasis);
 
-  const nestedEnter = svg.selectAll('.line-path').data(nested).enter();
-
-  const lines = nestedEnter
-    .append('path')
+  svg
+    .selectAll('.line-path')
+    .data(nested)
+    .join('path')
     .attr('class', 'line-path')
     .attr('d', (d) => lineGenerator(d.values) || '')
     .attr('fill', 'transparent')
@@ -149,34 +163,34 @@ const drawChart = ({
         .style('cursor', 'none');
     });
 
-  const groups = svg.append('g').selectAll('g').data(colorScale.domain());
+  svg.selectAll('path').transition().duration(animationDuration);
 
-  const groupsEnter = groups.enter().append('g');
-
-  groupsEnter
-    .merge(groups.select('g'))
-    .attr('transform', (d, i) => `translate(${width + 30}, ${100 + i * 25})`);
-
-  groupsEnter
-    .merge(groups.select('rect'))
-    .append('rect')
-    .attr('width', 14)
-    .attr('height', 14)
-    .attr('class', 'legendRect')
-    .attr('fill', (d) => colorScale(d));
-
-  groupsEnter
-    .merge(groups.select('text'))
-    .append('text')
+  svg
+    .select('.legends')
+    .selectAll('.legend-text')
+    .data(colorScale.domain())
+    .join('text')
+    .attr('class', 'legend-text')
+    .attr('transform', (d, i) => `translate(${width + 30}, ${100 + i * 25})`)
     .text((d) => d)
     .attr('x', 20)
     .attr('y', '.8em')
     .attr('fill', 'black')
     .style('font-size', '14px');
+
+  svg
+    .select('.legends')
+    .selectAll('.legend-rect')
+    .data(colorScale.domain())
+    .join('rect')
+    .attr('class', 'legend-rect')
+    .attr('transform', (d, i) => `translate(${width + 30}, ${100 + i * 25})`)
+    .attr('width', 14)
+    .attr('height', 14)
+    .attr('fill', (d) => colorScale(d));
 };
 
 const xValue = (d: IChartData) => d.x;
 const yValue = (d: IChartData) => d.y;
-const colorValue = (d: IChartData) => d.category;
 
 export default MultiLineChart;
